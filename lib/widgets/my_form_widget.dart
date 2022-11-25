@@ -1,0 +1,133 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_codigo_taskbd/db/db_admin.dart';
+import 'package:flutter_codigo_taskbd/models/task_model.dart';
+import 'package:get/get.dart';
+
+class MyFormWidget extends StatefulWidget {
+  bool edit;
+  MyFormWidget({this.edit = false, super.key});
+
+  @override
+  State<MyFormWidget> createState() => _MyFormWidgetState();
+}
+
+class _MyFormWidgetState extends State<MyFormWidget> {
+  final _formKey = GlobalKey<FormState>();
+
+  bool isFinished = false;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+
+  addTask() {
+    if (_formKey.currentState!.validate()) {
+      TaskModel taskModel = TaskModel(
+          title: _titleController.text,
+          description: _descriptionController.text,
+          status: isFinished.toString());
+      DBAdmin.db.inssertTask(taskModel).then((value) {
+        if (value > 0) {
+          Get.back();
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.indigo,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              duration: Duration(milliseconds: 1200),
+              content: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    color: Colors.white,
+                  ),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  Text(widget.edit
+                      ? 'Tarea modificada con éxito'
+                      : 'Tarea registrada con éxito')
+                ],
+              )));
+        }
+        print(value);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(widget.edit ? 'Modificar tarea' : 'Agregar tarea'),
+            SizedBox(
+              height: 6.0,
+            ),
+            TextFormField(
+              controller: _titleController,
+              decoration: InputDecoration(hintText: 'Titulo'),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return "El campo es obligatorio";
+                }
+                return null;
+              },
+            ),
+            SizedBox(
+              height: 6.0,
+            ),
+            TextFormField(
+              controller: _descriptionController,
+              maxLines: 3,
+              decoration: InputDecoration(hintText: 'Description'),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return "El campo es obligatorio";
+                }
+                return null;
+              },
+            ),
+            SizedBox(
+              height: 6.0,
+            ),
+            Row(
+              children: [
+                Text('Estado: '),
+                SizedBox(
+                  width: 6.0,
+                ),
+                Checkbox(
+                    value: isFinished,
+                    onChanged: (value) {
+                      isFinished = value!;
+                      setState(() {});
+                    }),
+              ],
+            ),
+            SizedBox(
+              height: 6.0,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                    onPressed: () => Get.back(), child: Text('Cancelar')),
+                SizedBox(
+                  width: 10.0,
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      addTask();
+                    },
+                    child: Text('Aceptar')),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
