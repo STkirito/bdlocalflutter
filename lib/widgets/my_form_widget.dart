@@ -4,8 +4,8 @@ import 'package:flutter_codigo_taskbd/models/task_model.dart';
 import 'package:get/get.dart';
 
 class MyFormWidget extends StatefulWidget {
-  bool edit;
-  MyFormWidget({this.edit = false, super.key});
+  TaskModel? model;
+  MyFormWidget({this.model, super.key});
 
   @override
   State<MyFormWidget> createState() => _MyFormWidgetState();
@@ -17,6 +17,16 @@ class _MyFormWidgetState extends State<MyFormWidget> {
   bool isFinished = false;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  @override
+  void initState() {
+    if (widget.model != null) {
+      _titleController.text = widget.model!.title;
+      _descriptionController.text = widget.model!.description;
+      isFinished = widget.model!.status == 'true' ? true : false;
+    }
+
+    super.initState();
+  }
 
   addTask() {
     if (_formKey.currentState!.validate()) {
@@ -43,7 +53,7 @@ class _MyFormWidgetState extends State<MyFormWidget> {
                   SizedBox(
                     width: 10.0,
                   ),
-                  Text(widget.edit
+                  Text(widget.model != null
                       ? 'Tarea modificada con éxito'
                       : 'Tarea registrada con éxito')
                 ],
@@ -62,7 +72,7 @@ class _MyFormWidgetState extends State<MyFormWidget> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(widget.edit ? 'Modificar tarea' : 'Agregar tarea'),
+            Text(widget.model != null ? 'Modificar tarea' : 'Agregar tarea'),
             SizedBox(
               height: 6.0,
             ),

@@ -16,12 +16,12 @@ class _HomePageState extends State<HomePage> {
     return 'Juan Mnauel';
   }
 
-  showDialogFrom(BuildContext context, {bool edit = false}) {
+  showDialogFrom(BuildContext context, {TaskModel? model}) {
     showDialog(
       context: context,
       builder: (context) {
         return MyFormWidget(
-          edit: edit,
+          model: model,
         );
       },
     ).then((value) => setState(() {}));
@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
                         subtitle: Text(mytasks[index].description),
                         trailing: IconButton(
                             onPressed: () {
-                              showDialogFrom(context, edit: true);
+                              showDialogFrom(context, model: mytasks[index]);
                             },
                             icon: Icon(Icons.edit)),
                       ),
